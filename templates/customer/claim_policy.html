@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+{% load static %}
+{% load widget_tweaks %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+        }
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            background-color: #f3f3f3;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            padding-top: 60px;
+            display: none;
+            border-right: 2px solid #c3c3c3;
+            margin-right: 10px;
+        }
+        .sidebar a {
+            padding: 15px 10px;
+            text-align: center;
+            font-size: 18px;
+            color: black;
+            display: block;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background-color: #c3c3c3;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+        }
+        .card {
+            margin: 20px 0;
+            background-color: #f7f7f7;
+
+        }
+        .custom-card {
+            background-color: #f7f7f7;
+
+        }
+        .custom-card:hover {
+            box-shadow: 1px 3px 1px 3px solid #495057;
+        }
+        
+        .card:hover {
+            box-shadow: 1px 3px 1px 3px solid #495057;
+        }
+        .box-class {
+            /* border: 2px solid #eee; */
+            /* background-color: #f7f7f7; */
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body class="bg-light" style=" width: 80%; margin-top:100px">
+    <!-- Main content -->
+    <div class="main-content">
+        {% include 'customer/navbar.html' %}
+    <div id="add-claims" class="box-class bg-outline-secondary border-0 shadow-sm p-3 mb-5 bg-white rounded">
+        {% for message in messages %}
+        <div class="alert alert-danger" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+        <h4 class="text-center text-muted">Claim Policy</h4>
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row align-items-center justify-content-center">
+                <div class="form-group col-md-6">
+                    <label for="dependent" class="text-muted">Dependent</label>
+                    {% render_field form.dependent|attr:'required:true'  class="form-control p-1" placeholder="Select Dependent" %}
+                </div>
+                <div class="form-group col-md-6 ">
+                    <label for="claim_amount" class="text-muted">Claim Amount</label>
+                    {% render_field form.claim_amount|attr:'required:true'  class="form-control p-1" placeholder="Enter claim amount" %}
+                </div>
+            </div>
+            <div class="form-row align-items-center justify-content-center">
+                <div class="form-group col-md-6 ">
+                    <label for="hospital" class="text-muted">Hospital</label>
+                    <!-- {{ form.dependents|add_class:'form-control' }} -->
+                    {% render_field form.hospital|attr:'required:true'  class="form-control p-1" placeholder="Enter Hospital Name" %}
+                </div>
+                <div class="form-group col-md-6 ">
+                    <label for="details" class="text-muted">Details</label>
+                    <!-- {{ form.dependents|add_class:'form-control' }} -->
+                    {% render_field form.details|attr:'required:true'  class="form-control p-1" placeholder="Enter Claim Details" %}
+                </div>
+            </div>
+            <div class="form-row align-items-center justify-content-center">
+                <button type="reset" class="btn btn-outline-secondary btn-lg m-2 p-1 col-md-2 w-50">Clear</button>
+                <button type="submit" class="btn btn-primary btn-lg m-2 p-1 col-md-2 w-50">Claim</button>
+            </div>
+        </form>
+        <div id="policy" class="bg-outline-secondary border-0 shadow-sm p-3 mb-5 bg-white rounded">
+            <h4 class="text-center text-muted">Policy Details</h4>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Policy</th>
+                            <th>Premium Paid</th>
+                            <th>Sum Assurance</th>
+                            <th>Amount Claimed</th>
+                            <th>Hospitals</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td>{{policy.policy_premium}}</td>
+                            <td class="text-info">${{policy.premium_paid}}</td>
+                            <td class="text-primary">${{policy.policy_premium.policy.sum_assurance}}</td>
+                            <td class="text-success" >${{policy.amount_claimed}}</td>
+                            <td>{{policy.policy_premium.number_of_hospitals}}</td>
+                        </tr>
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

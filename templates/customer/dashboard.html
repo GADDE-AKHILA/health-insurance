@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+{% load static %}
+{% load widget_tweaks %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+        }
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            background-color: #f3f3f3;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            padding-top: 60px;
+            display: none;
+            border-right: 2px solid #c3c3c3;
+            margin-right: 10px;
+        }
+        .sidebar a {
+            padding: 15px 10px;
+            text-align: center;
+            font-size: 18px;
+            color: black;
+            display: block;
+            text-decoration: none;
+        }
+        .sidebar a:hover {
+            background-color: #c3c3c3;
+        }
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            flex-grow: 1;
+        }
+        .card {
+            margin: 20px 0;
+            background-color: #f7f7f7;
+
+        }
+        .custom-card {
+            background-color: #f7f7f7;
+
+        }
+        .custom-card:hover {
+            box-shadow: 1px 3px 1px 3px solid #495057;
+        }
+        
+        .card:hover {
+            box-shadow: 1px 3px 1px 3px solid #495057;
+        }
+        .box-class {
+            /* border: 2px solid #eee; */
+            /* background-color: #f7f7f7; */
+            margin-bottom: 20px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body class="bg-light" style=" width: 80%; margin-top:100px">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <a href="/customer/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        <a href="#policies"><i class="fas fa-file-alt"></i> My Policies</a>
+        <a href="#claims"><i class="fas fa-clipboard-list"></i> Claims</a>
+        <a href="#account"><i class="fas fa-user"></i> Account</a>
+        <a href="#support"><i class="fas fa-headset"></i> Support</a>
+    </div>
+
+    
+    <!-- Main content -->
+    <div class="main-content">
+        {% include 'customer/navbar.html' %}
+        <!-- Dashboard -->
+        <div id="dashboard">
+            <h4 class="text-center m-0 text-muted display-6">Welcome to Your Dashboard</h4>
+            <div class="row">
+                <div class="col-md-3 custom-card">
+                    <div class="card bg-outline-secondary border-0 shadow-sm p-3 mb-5 bg-white rounded">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Your Policies</h5>
+                            <!-- <p class="card-text text-muted">Number of policies you have</p> -->
+                            <h3 class="card-text text-center text-dark">{{metrics.total_policies}}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 custom-card">
+                    <div class="card bg-outline-secondary border-0 shadow-sm p-3 mb-5 bg-white rounded">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Pending Claim</h5>
+                            <!-- <p class="card-text text-muted">Claims that are currently active</p> -->
+                            <h3 class="card-text text-primary text-center">${{metrics.pending_claims_amount}}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 custom-card">
+                    <div class="card bg-outline-secondary border-0 shadow-sm p-3 mb-5 bg-white rounded">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Approved Claim</h5>
+                            <!-- <p class="card-text text-muted">Total amount claimed</p> -->
+                            <h3 class="card-text text-center text-success">${{metrics.approved_claims_amount}}</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 custom-card">
+                    <div class="card bg-outline-secondary border-0 shadow-sm p-3 mb-5 bg-white rounded">
+                        <div class="card-body">
+                            <h5 class="card-title text-muted">Policy Balance</h5>
+                            <!-- <p class="card-text text-muted">Total amount claimed</p> -->
+                            <h3 class="card-text text-center text-info">${{metrics.balance_amount}}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Policies -->
+        <div id="policies" class="bg-outline-secondary border-0 shadow-sm p-3 mb-5 bg-white rounded">
+            <h4 class="text-center text-muted">My Policies</h4>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Policy</th>
+                            <th>Premium Type</th>
+                            <th>Sum Assurance</th>
+                            <th>Premium Paid</th>
+                            <th>Hospitals</th>
+                            <th>End Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for hpolicy in health_policies %}
+                        <tr>
+                            <td>{{hpolicy.policy_premium.policy}}</td>
+                            <td> {% if hpolicy.policy_premium.premium_type == 'Gold' %}
+                                    <span class="badge badge-primary p-1" style="color:#FFD700">Gold</span>
+                                {% elif hpolicy.policy_premium.premium_type == 'Diamond' %}
+                                    <span class="badge badge-info p-1" style="color:#B9F2FF">Diamond</span>
+                                {% else %}
+                                <span class="badge badge-success p-1" style="color:#E5E4E2">Diamond</span>
+                                {% endif %}
+
+                                </td>
+                            <td>{{hpolicy.policy_premium.policy.sum_assurance}}</td>
+                            <td>${{hpolicy.premium_paid}}/year</td>
+                            <td>{{hpolicy.policy_premium.number_of_hospitals}}</td>
+                            <td>{{hpolicy.end_date}}</td>
+                            <td><!-- <a href="{% url 'renew_policy' hpolicy.id  %}"  class="p-2 text-decoration-none">upgrade</a> -->
+                                <a href="{% url 'claim_insurance' hpolicy.id  %}"  class="p-2 text-decoration-none text-success">claim</a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Claims -->
+        <div id="claims" class="bg-outline-secondary border-0 shadow-sm p-3 mb-5 bg-white rounded">
+            <h4 class="text-center text-muted display-6">Claims</h4>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Policy</th>
+                            <th>Dependent</th>
+                            <th>Claim Amount</th>
+                            <th>Hospital</th>
+                            <th>Claim Date</th>
+                            <th>Status</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for claim in claims %}
+                        <tr class="border-0 border-b-2">
+                            <td>{{claim.policy.policy_premium}}</td>
+                            <td>{{claim.dependent}}</td>
+                            <td>${{claim.claim_amount}}</td>
+                            <td>{{claim.hospital}}</td>
+                            <td>{{claim.claim_date}}</td>
+                            <td>{% if claim.status == 'Approved' %}
+                                <span class="badge badge-success">Approved</span>
+                                {% elif claim.status == 'Pending' %}
+                                <span class="badge badge-primary">Pending</span>
+                                {% elif claim.status == 'Rejected' %}
+                                <span class="badge badge-danger">Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td>{{claim.details}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Account -->
+        <div id="account" class="box-class bg-outline-secondary border-0 shadow-sm p-3 mb-5 bg-white rounded">
+            <h4 class="text-center text-muted">Account Information</h4>
+            <p>Username: {{request.user.username}}</p>
+            <p>Email: {{request.user.email}}</p>
+            <p>mobile: {{customer.mobile}}</p>
+        </div>
+
+        <!-- Support -->
+        <div id="support" class=" box-class bg-outline-secondary border-0 shadow-sm p-3 mb-5 bg-white rounded">
+            <h4 class="text-center text-muted">Support</h4>
+            <p>If you need any assistance, please contact our support team.</p>
+            <p>Email: support@healthinsurance.com</p>
+        </div>
+    </div>
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
