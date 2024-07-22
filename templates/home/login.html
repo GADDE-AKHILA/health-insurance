@@ -75,9 +75,14 @@
         <div class="login-image"></div>
         <div class="login-form">
             <h2>Login</h2>
-            {% if error %}
-                <p class="error">{{ error }}</p>
-            {% endif %}
+            <div>{% if messages %}
+                {% for message in messages %}
+                  <div class="alert alert-danger" role="alert">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              {% endif %}
+            </div> 
             <form method="post">
                 {% csrf_token %}
                 <div class="form-group">
@@ -86,10 +91,10 @@
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    {% render_field form.password class="form-control" placeholder="Enter Password" %}
+                    {% render_field form.password1 class="form-control" placeholder="Enter Password" %}
            
                 </div>
-                <a href="#" class="forgot-password">Forgot password?</a>
+                <!-- <a href="#" class="forgot-password">Forgot password?</a> -->
                 <button type="submit" class="btn btn-primary">Login</button>
             </form>
         </div>

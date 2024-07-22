@@ -1,5 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponseRedirect
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import Group
 from django.contrib import messages
 from . import forms as CFORM
 from .import models as CMODEL
@@ -11,13 +13,50 @@ from health_core.validators import health_policy_validator
 from health_core.validators import dependents_validator
 from health_core.validators import claim_validator
 from health_core.exceptions.health_exception import HealthPolicyException, DependentException, ClaimException
+
+
+def login_view(request):
+    form = CFORM.UserForm()
+    data = {'form':form}
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password1')
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('/after_login')
+        else:
+            messages.error(request, 'Invalid username or password.')
+    return render(request, 'home/login.html', context = data)
+
+
 def signup_page_view(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect('after_login')
     user_form = CFORM.UserForm()
     customer_form = CFORM.CustomerForm()
+    if request.method == 'POST':
+        try:
+            user_form= CFORM.UserForm(request.POST)
+            customer_form = CFORM.CustomerForm(request.POST)
+            if user_form.is_valid() and customer_form.is_valid():
+                user = user_form.save()
+                customer =  customer_form.save(commit=False)
+                customer.user = user
+                customer.save()
+                customer_group = Group.objects.get_or_create(name='INSURANCE_USER')
+                customer_group[0].user_set.add(user)
+                return HttpResponseRedirect('/customer/login')
+            else:
+                messages.error(request, user_form.errors)
+                messages.error(request, customer_form.errors)
+        except Exception as e:
+            print('signup exception: ',e)
+            messages.error(request, 'unable to create signup')
+
     data = {'userForm': user_form, 'customerForm':customer_form}
     return render(request,'home/signup.html', data)
+
 
 def customer_dashboard_view(request):
     health_policies = data_helper.get_user_policies(request.user, HMODEL.HealthPolicy)

@@ -3,7 +3,8 @@ from django.contrib.auth.views import LoginView
 from customer import views
 
 urlpatterns = [
-    path('login', LoginView.as_view(template_name='home/login.html'),name='login_page'),
+    # path('login', LoginView.as_view(template_name='home/login.html'),name='login_page'),
+    path('login', views.login_view, name='login_page'),
     path('signup', views.signup_page_view, name = 'customer_signup'),
     path('dashboard', views.customer_dashboard_view, name='customer_dashboard'),
     path('apply-policy',views.apply_policy, name='apply_policy'),
