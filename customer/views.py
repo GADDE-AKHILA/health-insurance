@@ -32,7 +32,7 @@ def login_view(request):
 
 def signup_page_view(request):
     if request.user.is_authenticated:
-        return HttpResponseRedirect('after_login')
+        return HttpResponseRedirect('/after_login')
     user_form = CFORM.UserForm()
     customer_form = CFORM.CustomerForm()
     if request.method == 'POST':
