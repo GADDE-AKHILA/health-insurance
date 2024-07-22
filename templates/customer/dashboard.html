@@ -217,9 +217,11 @@
             <div class="d-flex align-items-center justify-content-start">
                 <div class="col w-50">
                     {% if customer.profile_pic %}
-                        <img src='{% static "customer.profile_pic" %}' class="circular-image" />
+                        <img src='{{ "customer.profile_pic" }}' class="circular-image" />
+                        
+                         <!-- <img src='https://x22249184-health-insurance.s3.eu-west-1.amazonaws.com/music-event.jpeg' class="circular-image" /> -->
                     {% else %}
-                    <img src='{{ customer.profile_pic }}' class="circular-image" />
+                    <img src='{% static "customer.profile_pic" %}' class="circular-image" />
                     {% endif %}
                 </div>
                 <div class="col">
