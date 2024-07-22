@@ -63,6 +63,13 @@
             margin-bottom: 20px;
             padding: 20px;
         }
+        .circular-image {
+            width: 100px; /* Adjust the size as needed */
+            height: 100px; /* Adjust the size as needed */
+            border-radius: 50%;
+            border: 5px solid #28a745; /* Adjust the border color and size as needed */
+            object-fit: cover; /* Ensure the image covers the entire area */
+        }
     </style>
 </head>
 <body class="bg-light" style=" width: 80%; margin-top:100px">
@@ -207,9 +214,20 @@
         <!-- Account -->
         <div id="account" class="box-class bg-outline-secondary border-0 shadow-sm p-3 mb-5 bg-white rounded">
             <h4 class="text-center text-muted">Account Information</h4>
-            <p>Username: {{request.user.username}}</p>
-            <p>Email: {{request.user.email}}</p>
-            <p>mobile: {{customer.mobile}}</p>
+            <div class="d-flex align-items-center justify-content-start">
+                <div class="col w-50">
+                    {% if customer.profile_pic %}
+                        <img src='{% static "customer.profile_pic" %}' class="circular-image" />
+                    {% else %}
+                    <img src='{{ customer.profile_pic }}' class="circular-image" />
+                    {% endif %}
+                </div>
+                <div class="col">
+                    <p>Username: {{request.user.username}}</p>
+                    <p>Email: {{request.user.email}}</p>
+                    <p>mobile: {{customer.mobile}}</p>
+                </div>
+            </div>
         </div>
 
         <!-- Support -->
