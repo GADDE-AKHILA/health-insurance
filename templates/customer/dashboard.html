@@ -216,7 +216,7 @@
             <h4 class="text-center text-muted">Account Information</h4>
             <div class="d-flex align-items-center justify-content-start">
                 <div class="col w-50">
-                        <img src='{{ "customer.profile_pic" }}' class="circular-image" />
+                        <img src='{{ customer.s3_document_url }}' class="circular-image" />
                 </div>
                 <div class="col">
                     <p>Username: {{request.user.username}}</p>

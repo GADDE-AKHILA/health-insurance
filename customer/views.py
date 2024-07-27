@@ -1,8 +1,10 @@
 from django.shortcuts import render,redirect
 from django.http import HttpResponseRedirect
+import requests
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import Group
 from django.contrib import messages
+import os
 from . import forms as CFORM
 from .import models as CMODEL
 from insurance import forms as HFORM
@@ -14,7 +16,7 @@ from health_core.validators import dependents_validator
 from health_core.validators import claim_validator
 from health_core.exceptions.health_exception import HealthPolicyException, DependentException, ClaimException
 
-
+DOCUMENT_API_URL = os.getenv('AWS_DOCUMENT_API_URL')
 def login_view(request):
     form = CFORM.UserForm()
     data = {'form':form}
@@ -30,6 +32,23 @@ def login_view(request):
     return render(request, 'home/login.html', context = data)
 
 
+def upload_document_to_s3(data, file):
+    files = {'file':file.read()}
+    response = requests.post(data['url'], data = data['fields'],files= files)
+    if response.status_code == 200 or response.status_code== 204:
+        return 'Image Uploaded successfully'
+    else:
+        raise HealthPolicyException("Unable to upload documents to s3")
+    pass
+
+def get_presigned_url(request):
+    response = requests.post(DOCUMENT_API_URL)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise HealthPolicyException("Unable to upload documents to s3")
+
+
 def signup_page_view(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect('/after_login')
@@ -39,9 +58,17 @@ def signup_page_view(request):
         try:
             user_form= CFORM.UserForm(request.POST)
             customer_form = CFORM.CustomerForm(request.POST)
+            print('customerForm: ', customer_form)
             if user_form.is_valid() and customer_form.is_valid():
-                user = user_form.save()
+                user = user_form.save(commit=False)
                 customer =  customer_form.save(commit=False)
+                profile_pic  = request.FILES["profile_pic"]
+                response = get_presigned_url(request)
+                print('document_api_response: ', response)
+                if(response['status']=='SUCCESS') :
+                    print('upload document respone: ', upload_document_to_s3(response['data'], profile_pic))
+                customer.s3_document_url = f"{response['data']['url']}{response['data']['fields']['key']}"
+                user.save()
                 customer.user = user
                 customer.save()
                 customer_group = Group.objects.get_or_create(name='INSURANCE_USER')
@@ -50,6 +77,9 @@ def signup_page_view(request):
             else:
                 messages.error(request, user_form.errors)
                 messages.error(request, customer_form.errors)
+        except HealthPolicyException as e:
+            print('signup exception: ',e)
+            messages.error(request, str(e))
         except Exception as e:
             print('signup exception: ',e)
             messages.error(request, 'unable to create signup')

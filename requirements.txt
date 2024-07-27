@@ -10,4 +10,5 @@ pytz==2023.3
 django-core
 boto3
 django-storages
+requests
 x22249184-healthinsurance==1.0.0
